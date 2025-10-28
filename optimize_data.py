@@ -128,14 +128,17 @@ def create_dimension_tables(consolidated_file, output_dir='dimension_tables'):
         for row in reader:
             # Clubs dimension
             club = row.get('Club', '').strip()
-            if club and club not in clubs:
-                clubs[club] = {
-                    'competition': row.get('competicizontinente', '').strip(),
-                }
+            # Filter out URLs and empty values
+            if club and not club.startswith('http'):
+                if club not in clubs:
+                    clubs[club] = {
+                        'competition': row.get('competicizontinente', '').strip(),
+                    }
             
             # Nationalities dimension
             nationality = row.get('Nationality', '').strip()
-            if nationality:
+            # Filter out URLs that may have been incorrectly placed in nationality field
+            if nationality and not nationality.startswith('http'):
                 nationalities.add(nationality)
     
     # Write Clubs dimension table
