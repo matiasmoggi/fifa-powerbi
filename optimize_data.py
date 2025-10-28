@@ -131,6 +131,7 @@ def create_dimension_tables(consolidated_file, output_dir='dimension_tables'):
             # Filter out URLs and empty values
             if club and not club.startswith('http'):
                 if club not in clubs:
+                    # Note: 'competicizontinente' is the actual column name in the source data
                     clubs[club] = {
                         'competition': row.get('competicizontinente', '').strip(),
                     }

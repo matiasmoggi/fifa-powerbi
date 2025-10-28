@@ -4,7 +4,7 @@ This guide helps you quickly optimize your FIFA Power BI dashboard for better pe
 
 ## Prerequisites
 
-- Python 3.6 or higher
+- Python 3.8 or higher
 - Access to the FIFA CSV files
 
 ## Step 1: Install Dependencies
@@ -154,7 +154,7 @@ For detailed information, see [PERFORMANCE_GUIDE.md](PERFORMANCE_GUIDE.md)
 
 If you encounter issues:
 1. Check that all CSV files are in the same directory
-2. Verify Python version: `python3 --version` (needs 3.6+)
+2. Verify Python version: `python3 --version` (needs 3.8+)
 3. Re-run optimization script
 4. Check the PERFORMANCE_GUIDE.md for advanced troubleshooting
 
