@@ -1,0 +1,18 @@
+# Optimized/Generated Files
+fifa_data_consolidated.csv
+dimension_tables/
+*.pyc
+__pycache__/
+
+# Temporary files
+/tmp/
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
