@@ -54,9 +54,8 @@ def fix_encoding(text):
         'M-|': 'ü',  # München
         'M-^': 'ô',  # Côte
         'M-sn': 'ón', # División
-        'SuM-arez': 'Suárez',
-        'MM-|nchen': 'München',
         'M-,': 'é',  # Common accent
+        'M-3': 'ó',  # ó
         '�': '',     # Remove replacement character
     }
     
@@ -99,7 +98,8 @@ def optimize_csv_file(input_file, output_file, remove_urls=False):
             
             # Write with clean UTF-8 encoding and Unix line endings
             with open(output_file, 'w', encoding='utf-8', newline='\n') as outfile:
-                writer = csv.DictWriter(outfile, fieldnames=fieldnames, delimiter=output_delimiter)
+                writer = csv.DictWriter(outfile, fieldnames=fieldnames, delimiter=output_delimiter, 
+                                       extrasaction='ignore')  # Ignore extra fields
                 writer.writeheader()
                 
                 for row in reader:
@@ -108,7 +108,9 @@ def optimize_csv_file(input_file, output_file, remove_urls=False):
                     # Process each field
                     cleaned_row = {}
                     for key, value in row.items():
-                        # Skip URL columns if requested
+                        # Skip None keys (extra fields) and URL columns if requested
+                        if key is None:
+                            continue
                         if remove_urls and key in url_columns:
                             continue
                         
