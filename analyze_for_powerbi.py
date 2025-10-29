@@ -33,6 +33,9 @@ def analyze_csv_files():
     column_analysis = defaultdict(lambda: {'unique_values': set(), 'null_count': 0, 'total_count': 0})
     url_columns = []
     
+    # Configuration
+    SAMPLE_SIZE = 1000  # Number of rows to sample per file for analysis
+    
     print(f"\nAnalyzing {len(csv_files)} CSV files...\n")
     
     # Analyze each file
@@ -48,13 +51,15 @@ def analyze_csv_files():
             for row in reader:
                 file_rows += 1
                 
-                # Sample first 1000 rows for column analysis
-                if file_rows <= 1000:
+                # Sample first SAMPLE_SIZE rows for column analysis
+                if file_rows <= SAMPLE_SIZE:
                     for key, value in row.items():
                         if key:
                             column_analysis[key]['total_count'] += 1
                             if value:
-                                column_analysis[key]['unique_values'].add(value[:100])  # Limit string length
+                                # Use hash for unique values to handle long strings accurately
+                                value_hash = hash(value)
+                                column_analysis[key]['unique_values'].add(value_hash)
                                 
                                 # Check for URLs
                                 if 'http://' in value or 'https://' in value:
@@ -105,14 +110,32 @@ def analyze_csv_files():
         print(f"URL COLUMNS ANALYSIS")
         print(f"{'='*70}")
         print("\nColumns containing URLs (consider removing or creating lookups):")
+        
+        # Calculate actual average URL length from samples
+        total_url_chars = 0
+        url_count = 0
+        
+        for csv_file in csv_files[:1]:  # Sample from first file
+            with open(csv_file, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f, delimiter=',')
+                for i, row in enumerate(reader):
+                    if i >= 100:
+                        break
+                    for col in url_columns:
+                        if row.get(col) and ('http://' in row[col] or 'https://' in row[col]):
+                            total_url_chars += len(row[col])
+                            url_count += 1
+        
+        avg_url_length = total_url_chars / max(url_count, 1) if url_count > 0 else 60
+        
         for col in url_columns:
             unique = len(column_analysis[col]['unique_values'])
             print(f"  - {col}: ~{unique} unique URLs")
         
-        # Calculate potential savings
-        avg_url_length = 60  # Average URL length in chars
+        # Calculate potential savings using actual average
         url_bytes = total_rows * len(url_columns) * avg_url_length
         print(f"\nEstimated space used by URLs: {url_bytes/1024/1024:.2f} MB")
+        print(f"  (Based on average URL length of {avg_url_length:.0f} characters)")
         print(f"Potential savings if URLs removed: ~{url_bytes/total_size*100:.1f}% of total size")
     
     # Data model recommendations
